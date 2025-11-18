@@ -11,12 +11,12 @@ github: [Will be updated when synced to GitHub]
 
 ## Overview
 
-基于Python异步框架构建的商品数据同步系统，采用三层架构设计（抓取层→处理层→存储层），支持高并发大规模数据抓取。通过命令行、Web界面、API三种方式触发同步，实现从1688平台到本地数据库的稳定数据同步，日处理能力10,000+商品。
+基于Scrapy成熟爬虫框架构建的商品数据同步系统，采用三层架构设计（抓取层→处理层→存储层），利用Scrapy的高并发能力和中间件机制实现大规模数据抓取。通过命令行、Web界面、API三种方式触发同步，实现从1688平台到本地数据库的稳定数据同步，日处理能力10,000+商品。
 
 ## Architecture Decisions
 
 - **开发语言**: Python 3.10+
-- **异步框架**: asyncio + aiohttp（高并发请求）
+- **爬虫框架**: Scrapy（成熟异步爬虫框架）
 - **数据存储**: MySQL + Redis缓存
 - **图片存储**: 本地文件系统 + CDN优化
 - **任务队列**: Celery + Redis
@@ -25,8 +25,9 @@ github: [Will be updated when synced to GitHub]
 - **部署方式**: Docker容器化
 
 ### 技术选型理由
-- Python生态成熟，有丰富的数据抓取库
-- asyncio提供高并发性能，支持100+并发连接
+- Scrapy是业界成熟的异步爬虫框架，生态完善
+- Scrapy内置高并发处理，强大的下载中间件系统
+- Scrapy支持丰富的反爬虫策略和扩展机制
 - FastAPI比Flask性能更高，自动API文档生成
 - MySQL稳定可靠，适合结构化商品数据
 - Redis提供高性能缓存和队列支持
@@ -40,7 +41,9 @@ github: [Will be updated when synced to GitHub]
 
 ### Backend Services
 - **抓取服务 (Scraper Service)**
-  - 商品详情页抓取
+  - Scrapy Spider编写（商品详情页、列表页）
+  - Item Pipeline数据处理
+  - 下载中间件（代理IP、用户代理轮换）
   - 图片下载和压缩
   - 反爬虫策略处理
 
@@ -89,7 +92,7 @@ github: [Will be updated when synced to GitHub]
 
 ## Task Breakdown Preview
 
-- [ ] **核心技术**: 开发异步爬虫引擎，支持并发抓取和反爬虫处理
+- [ ] **核心技术**: 基于Scrapy框架构建爬虫系统，配置Spider和中间件
 - [ ] **数据处理**: 实现商品信息结构化、验证、去重和版本管理
 - [ ] **存储系统**: 设计数据库模型，实现CRUD操作和图片管理
 - [ ] **调度队列**: 构建任务队列系统，支持批量处理和断点续传
@@ -151,7 +154,7 @@ github: [Will be updated when synced to GitHub]
 - 1名产品经理（兼职协调）
 
 ### Critical Path Items
-1. 异步爬虫引擎开发（影响后续所有功能）
+1. 基于Scrapy的爬虫系统开发（影响后续所有功能）
 2. 数据库设计和实现（影响数据存储）
 3. Web API开发（影响前端和程序化调用）
 
