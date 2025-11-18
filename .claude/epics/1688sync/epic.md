@@ -4,7 +4,7 @@ status: backlog
 created: 2025-11-18T12:43:02Z
 progress: 0%
 prd: .claude/prds/1688sync.md
-github: [Will be updated when synced to GitHub]
+github: https://github.com/bonzaphp/1688sync/issues/1
 ---
 
 # Epic: 1688sync
@@ -103,24 +103,23 @@ github: [Will be updated when synced to GitHub]
 - [ ] **性能优化**: 并发控制、缓存策略、数据库优化
 - [ ] **部署文档**: Docker化配置、部署脚本和运维文档
 
+
 ## Tasks Created
+- [ ] #2 - 存储系统 (parallel: false)
+- [ ] #3 - 核心技术 (parallel: true)
+- [ ] #4 - 调度队列 (parallel: true)
+- [ ] #5 - 数据处理 (parallel: true)
+- [ ] #6 - 命令行工具 (parallel: true)
+- [ ] #7 - Web API (parallel: true)
+- [ ] #8 - 管理界面 (parallel: true)
+- [ ] #9 - 监控日志 (parallel: true)
+- [ ] #10 - 性能优化 (parallel: true)
+- [ ] #11 - 部署文档 (parallel: true)
 
-- [ ] 001.md - 存储系统 (parallel: false, sequential)
-- [ ] 002.md - 核心技术 (parallel: true)
-- [ ] 003.md - 调度队列 (parallel: true)
-- [ ] 004.md - 数据处理 (parallel: true)
-- [ ] 005.md - 命令行工具 (parallel: true)
-- [ ] 006.md - Web API (parallel: true)
-- [ ] 007.md - 管理界面 (parallel: true)
-- [ ] 008.md - 监控日志 (parallel: true)
-- [ ] 009.md - 性能优化 (parallel: true)
-- [ ] 010.md - 部署文档 (parallel: true)
-
-Total tasks: 10
-Parallel tasks: 9
-Sequential tasks: 1 (001 - Storage System)
+Total tasks: 11
+Parallel tasks: 10
+Sequential tasks: 1 (2 - Storage System)
 Estimated total effort: 160-200 hours (8-10 weeks for 2 developers)
-
 ## Dependencies
 
 ### External Dependencies
