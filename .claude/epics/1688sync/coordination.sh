@@ -91,8 +91,8 @@ check_file_conflicts() {
 
     cd "$WORK_DIR"
 
-    # 检查merge冲突标记
-    CONFLICT_FILES=$(grep -r "<<<<<<< \|======= \|>>>>>>>" . --exclude-dir=.git 2>/dev/null || true)
+    # 检查merge冲突标记 (排除文档中的说明文字)
+    CONFLICT_FILES=$(grep -r "^<<<<<<< \|^\======= \|^\>>>>>>>" . --exclude-dir=.git --exclude="*.md" 2>/dev/null || true)
 
     if [[ -n "$CONFLICT_FILES" ]]; then
         log_error "检测到文件冲突:"
@@ -116,7 +116,7 @@ update_progress() {
 
     # 更新仪表板
     CURRENT_TIME=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-    NEXT_CHECK=$(date -u -d '+15 minutes' '+%H:%M UTC')
+    NEXT_CHECK=$(date -u -v+15M '+%H:%M UTC')
 
     # 这里可以添加更详细的进度统计逻辑
     PROGRESS_PERCENT=$((COMPLETED_TASKS * 100 / TOTAL_TASKS))
