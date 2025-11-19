@@ -1,10 +1,11 @@
 ---
 name: 1688sync
-status: backlog
+status: in-progress
 created: 2025-11-18T12:43:02Z
-progress: 0%
+updated: 2025-11-19T08:30:00Z
+progress: 10%
 prd: .claude/prds/1688sync.md
-github: [Will be updated when synced to GitHub]
+github: https://github.com/bonzaphp/1688sync/issues/1
 ---
 
 # Epic: 1688sync
