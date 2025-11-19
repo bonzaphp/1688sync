@@ -155,13 +155,17 @@ sync_github_status() {
 
 # 主协调函数
 main() {
-    log_info "开始1688sync Epic协调检查..."
-
     # 切换到工作目录
     cd "$WORK_DIR" || {
         log_error "无法切换到工作目录: $WORK_DIR"
         exit 1
     }
+
+    # 创建日志文件（如果不存在）
+    mkdir -p "$(dirname "$LOG_FILE")"
+    touch "$LOG_FILE"
+
+    log_info "开始1688sync Epic协调检查..."
 
     # 执行检查
     local exit_code=0
