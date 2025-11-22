@@ -1,0 +1,58 @@
+{
+  "logging": {
+    "level": "INFO",
+    "structured_format": true,
+    "include_stack_trace": true,
+    "file_rotation": true,
+    "retention_days": 30
+  },
+  "performance": {
+    "collection_interval": 30,
+    "history_size": 1000,
+    "auto_start": true,
+    "metrics": {
+      "system": true,
+      "application": true,
+      "custom": true
+    }
+  },
+  "error_tracking": {
+    "max_events": 10000,
+    "cleanup_interval": 3600,
+    "auto_capture": true,
+    "ignored_patterns": [],
+    "max_stack_trace_lines": 50
+  },
+  "alerting": {
+    "max_alerts": 10000,
+    "auto_start": true,
+    "evaluation_interval": 60,
+    "default_cooldown": 300,
+    "notifications": {
+      "email": {
+        "enabled": false,
+        "smtp_host": "",
+        "smtp_port": 587,
+        "username": "",
+        "password": "",
+        "from_email": "",
+        "to_emails": [],
+        "use_tls": true
+      },
+      "webhook": {
+        "enabled": false,
+        "url": "",
+        "headers": {},
+        "timeout": 30
+      }
+    }
+  },
+  "log_analysis": {
+    "analysis_interval": 300,
+    "max_patterns": 1000,
+    "auto_start": true,
+    "pattern_min_occurrences": 5,
+    "anomaly_threshold": 2.0,
+    "trend_window": 100
+  }
+}
