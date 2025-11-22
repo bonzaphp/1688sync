@@ -1,0 +1,91 @@
+# Redis配置 - 1688sync生产环境
+
+# 网络配置
+bind 0.0.0.0
+port 6379
+protected-mode yes
+tcp-backlog 511
+timeout 300
+tcp-keepalive 300
+
+# 内存配置
+maxmemory 2gb
+maxmemory-policy allkeys-lru
+maxmemory-samples 5
+
+# 持久化配置 - 生产优化
+save 900 1
+save 300 10
+save 60 10000
+rdbcompression yes
+rdbchecksum yes
+dbfilename dump.rdb
+dir /data
+stop-writes-on-bgsave-error yes
+
+# AOF配置 - 生产优化
+appendonly yes
+appendfilename "appendonly.aof"
+appendfsync everysec
+no-appendfsync-on-rewrite no
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 512mb
+aof-load-truncated yes
+aof-use-rdb-preamble yes
+
+# 日志配置
+loglevel notice
+logfile "/var/log/redis/redis.log"
+syslog-enabled yes
+syslog-ident redis
+
+# 安全配置 - 生产环境必须设置
+# requirepass your-strong-password-here
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
+rename-command KEYS ""
+rename-command CONFIG "CONFIG_b835c3f8a8d7e2f1c4a6b9e0d3f7a5c2"
+
+# 客户端配置
+maxclients 10000
+
+# 性能配置 - 生产优化
+hash-max-ziplist-entries 512
+hash-max-ziplist-value 64
+list-max-ziplist-size -2
+list-compress-depth 0
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+hll-sparse-max-bytes 3000
+stream-node-max-bytes 4096
+stream-node-max-entries 100
+
+# 慢日志配置
+slowlog-log-slower-than 10000
+slowlog-max-len 1024
+
+# 其他配置
+databases 16
+always-show-logo no
+notify-keyspace-events "Ex"
+
+# 复制配置 (如果需要主从复制)
+# replica-serve-stale-data yes
+# replica-read-only yes
+# repl-diskless-sync no
+# repl-diskless-sync-delay 5
+
+# 集群配置 (如果需要)
+# cluster-enabled yes
+# cluster-config-file nodes.conf
+# cluster-node-timeout 15000
+
+# 内存优化
+activerehashing yes
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit replica 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60
+hz 10
+dynamic-hz yes
+rdb-save-incremental-fsync yes

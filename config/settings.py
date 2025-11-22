@@ -3,7 +3,8 @@
 """
 import os
 from typing import Optional
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class AppSettings(BaseSettings):
@@ -52,3 +53,8 @@ class AppSettings(BaseSettings):
 
 # 全局配置实例
 app_settings = AppSettings()
+
+
+def get_settings() -> AppSettings:
+    """获取应用配置实例"""
+    return app_settings

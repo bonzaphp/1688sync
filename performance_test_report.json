@@ -1,0 +1,191 @@
+{
+  "test_timestamp": 1763836539.629466,
+  "test_results": {
+    "concurrency": {
+      "total_tasks": 100,
+      "execution_time": 11.292204141616821,
+      "tasks_per_second": 8.855667037709253,
+      "success_count": 100
+    },
+    "cache": {
+      "no_cache_time": 5.050790071487427,
+      "with_cache_time": 0.9323630332946777,
+      "improvement_percent": 81.54025370094024
+    },
+    "memory": {
+      "initial_memory_mb": 97.171875,
+      "peak_memory_mb": 99.46875,
+      "final_memory_mb": 100.109375,
+      "memory_recovered_mb": -0.640625,
+      "object_count_change": 3
+    },
+    "optimized_execution": {
+      "first_execution_time": 0.00041604042053222656,
+      "second_execution_time": 4.8160552978515625e-05,
+      "cache_speedup": 8.638613861386139,
+      "results_match": true
+    },
+    "monitoring": {
+      "total_requests": 1,
+      "avg_response_time": 0,
+      "success_rate": 1.0,
+      "alerts_count": 0
+    }
+  },
+  "comprehensive_stats": {
+    "timestamp": 1763836539.625802,
+    "manager_initialized": true,
+    "auto_optimization": true,
+    "concurrency": {
+      "total_requests": 111,
+      "active_requests": 0,
+      "completed_requests": 111,
+      "failed_requests": 0,
+      "avg_response_time": 4.584850950674578,
+      "peak_concurrent": 100,
+      "cpu_percent": 18.9,
+      "memory_percent": 53.9,
+      "active_threads": 2,
+      "config": {
+        "max_workers": 32,
+        "max_concurrent_requests": 100,
+        "rate_limit": 10.0
+      }
+    },
+    "cache": {
+      "strategy": "memory",
+      "backends": [
+        {
+          "level": 1,
+          "name": "MemoryCacheBackend",
+          "stats": {
+            "hits": 41,
+            "misses": 111,
+            "sets": 111,
+            "deletes": 0,
+            "clears": 0,
+            "size": 21,
+            "max_size": 100,
+            "hit_rate": 0.26973684210526316
+          }
+        }
+      ]
+    },
+    "database": {
+      "query_stats": {},
+      "slow_queries": [],
+      "failed_queries": [],
+      "pool_performance": {
+        "error": "数据库连接未初始化"
+      },
+      "query_cache_stats": {
+        "size": 0,
+        "max_size": 100,
+        "curr_size": 0,
+        "ttl": 300
+      }
+    },
+    "memory": {
+      "rss_mb": 101.109375,
+      "percent": 0.3085613250732422,
+      "object_count": 98078,
+      "gc_counts": [
+        81,
+        2,
+        0
+      ]
+    },
+    "memory_trend": {
+      "trend": "insufficient_data"
+    },
+    "system": {
+      "total_mb": 32768.0,
+      "available_mb": 15121.375,
+      "used_mb": 15941.859375,
+      "percent": 53.9,
+      "swap_total_mb": 6144.0,
+      "swap_used_mb": 4646.1875,
+      "swap_percent": 75.6
+    },
+    "performance": {
+      "report_time": 1763836539.62875,
+      "period_minutes": 5,
+      "system": {
+        "cpu_percent": 21.3,
+        "memory_percent": 53.6,
+        "disk_percent": 93.2
+      },
+      "requests": {
+        "total_requests": 1,
+        "requests_per_minute": 0.2,
+        "avg_response_time": 0.07195806503295898,
+        "p95_response_time": 0.07195806503295898,
+        "p99_response_time": 0.07195806503295898,
+        "status_codes": {
+          "200": 1
+        },
+        "success_rate": 1.0
+      },
+      "response_time": {},
+      "slow_requests": [],
+      "alerts": []
+    },
+    "metrics_summary": {
+      "counters": {
+        "system_network_sent_bytes": 5416642560.0,
+        "system_network_recv_bytes": 3956996096.0,
+        "request_count{endpoint=memory_test,method=FUNCTION,status=200}": 1.0
+      },
+      "gauges": {
+        "system_cpu_percent": 21.3,
+        "system_memory_percent": 53.6,
+        "system_memory_available_mb": 15202.9375,
+        "system_disk_percent": 93.2,
+        "system_disk_free_gb": 63.246524810791016,
+        "process_memory_rss_mb": 96.609375,
+        "process_memory_vms_mb": 402770.21875,
+        "process_cpu_percent": 0.0,
+        "process_fd_count": 18,
+        "process_thread_count": 1
+      },
+      "histograms": {
+        "request_response_time{endpoint=memory_test,method=FUNCTION}": {
+          "count": 1,
+          "sum": 0.07195806503295898,
+          "min": 0.07195806503295898,
+          "max": 0.07195806503295898,
+          "mean": 0.07195806503295898,
+          "median": 0.07195806503295898,
+          "p95": 0.07195806503295898,
+          "p99": 0.07195806503295898
+        },
+        "request_size{endpoint=memory_test,method=FUNCTION}": {
+          "count": 1,
+          "sum": 0,
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        },
+        "response_size{endpoint=memory_test,method=FUNCTION}": {
+          "count": 1,
+          "sum": 0,
+          "min": 0,
+          "max": 0,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0
+        }
+      }
+    }
+  },
+  "performance_config": {
+    "concurrency_max_workers": 32,
+    "cache_strategy": "memory",
+    "monitoring_enabled": true,
+    "auto_optimization": true
+  }
+}

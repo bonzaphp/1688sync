@@ -49,14 +49,12 @@ class DatabaseManager:
             self._engine = create_async_engine(
                 db_settings.database_url,
                 # 连接池配置
-                poolclass=QueuePool,
+                poolclass=NullPool if test_mode else QueuePool,
                 pool_size=db_settings.pool_size,
                 max_overflow=db_settings.max_overflow,
                 pool_timeout=db_settings.pool_timeout,
                 pool_recycle=db_settings.pool_recycle,
                 pool_pre_ping=db_settings.pool_pre_ping,
-                # 测试模式配置
-                poolclass=NullPool if test_mode else QueuePool,
                 # 连接选项
                 echo=db_settings.echo,
                 echo_pool=db_settings.echo_pool,

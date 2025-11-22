@@ -1,0 +1,120 @@
+# 1688sync 日志轮转配置
+
+# 应用日志
+/app/logs/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 644 app app
+    postrotate
+        # 发送信号给应用重新打开日志文件
+        docker-compose exec app kill -USR1 1 2>/dev/null || true
+    endscript
+}
+
+# Nginx日志
+/var/log/nginx/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 644 nginx nginx
+    postrotate
+        # 重新加载Nginx配置
+        docker-compose exec nginx nginx -s reload 2>/dev/null || true
+    endscript
+}
+
+# MySQL慢查询日志
+/var/log/mysql/slow.log {
+    weekly
+    missingok
+    rotate 12
+    compress
+    delaycompress
+    notifempty
+    create 644 mysql mysql
+    postrotate
+        # 刷新MySQL日志
+        docker-compose exec mysql mysqladmin flush-logs 2>/dev/null || true
+    endscript
+}
+
+# MySQL错误日志
+/var/log/mysql/error.log {
+    weekly
+    missingok
+    rotate 4
+    compress
+    delaycompress
+    notifempty
+    create 644 mysql mysql
+    postrotate
+        # 刷新MySQL日志
+        docker-compose exec mysql mysqladmin flush-logs 2>/dev/null || true
+    endscript
+}
+
+# Celery日志
+/app/logs/celery*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 644 app app
+    postrotate
+        # 重启Celery工作进程以重新打开日志
+        docker-compose restart celery-worker celery-beat 2>/dev/null || true
+    endscript
+}
+
+# 系统日志
+/app/logs/system/*.log {
+    daily
+    missingok
+    rotate 7
+    compress
+    delaycompress
+    notifempty
+    create 644 app app
+}
+
+# 监控日志
+/app/logs/monitoring/*.log {
+    daily
+    missingok
+    rotate 7
+    compress
+    delaycompress
+    notifempty
+    create 644 app app
+}
+
+# 访问日志
+/app/logs/access/*.log {
+    daily
+    missingok
+    rotate 30
+    compress
+    delaycompress
+    notifempty
+    create 644 app app
+}
+
+# 临时日志
+/app/logs/tmp/*.log {
+    size 100M
+    missingok
+    rotate 5
+    compress
+    delaycompress
+    notifempty
+    create 644 app app
+}

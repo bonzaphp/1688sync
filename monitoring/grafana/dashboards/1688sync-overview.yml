@@ -1,0 +1,178 @@
+# Grafana仪表盘配置 - 1688sync总览
+apiVersion: 1
+
+providers:
+  - name: 'default'
+    orgId: 1
+    folder: ''
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+
+dashboards:
+  - dashboard:
+      id: null
+      uid: 1688sync-overview
+      title: "1688sync 系统总览"
+      tags: ["1688sync", "overview"]
+      timezone: browser
+      panels:
+        # 系统状态
+        - title: "服务状态"
+          type: stat
+          gridPos: { h: 8, w: 12, x: 0, y: 0 }
+          targets:
+            - expr: up{job=~"1688sync-app|mysql|redis"}
+              legendFormat: "{{ job }}"
+          fieldConfig:
+            defaults:
+              mappings:
+                - options:
+                    "0": { text: "DOWN", color: "red" }
+                    "1": { text: "UP", color: "green" }
+                  type: value
+        - title: "系统负载"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 12, y: 0 }
+          targets:
+            - expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)
+              legendFormat: "CPU使用率"
+            - expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+              legendFormat: "内存使用率"
+
+        # 应用指标
+        - title: "HTTP请求率"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 0, y: 8 }
+          targets:
+            - expr: rate(http_requests_total[5m])
+              legendFormat: "{{ method }} {{ status }}"
+        - title: "响应时间"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 12, y: 8 }
+          targets:
+            - expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+              legendFormat: "95th percentile"
+            - expr: histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))
+              legendFormat: "50th percentile"
+
+        # 数据库指标
+        - title: "MySQL连接数"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 0, y: 16 }
+          targets:
+            - expr: mysql_global_status_threads_connected
+              legendFormat: "活跃连接"
+            - expr: mysql_global_variables_max_connections
+              legendFormat: "最大连接"
+        - title: "MySQL慢查询"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 12, y: 16 }
+          targets:
+            - expr: rate(mysql_global_status_slow_queries[5m])
+              legendFormat: "慢查询/秒"
+
+        # Redis指标
+        - title: "Redis内存使用"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 0, y: 24 }
+          targets:
+            - expr: redis_memory_used_bytes
+              legendFormat: "已使用内存"
+            - expr: redis_memory_max_bytes
+              legendFormat: "最大内存"
+        - title: "Redis连接数"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 12, y: 24 }
+          targets:
+            - expr: redis_connected_clients
+              legendFormat: "客户端连接"
+
+        # Celery指标
+        - title: "Celery任务队列"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 0, y: 32 }
+          targets:
+            - expr: celery_queue_length
+              legendFormat: "{{ queue_name }}"
+        - title: "Celery工作进程"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 12, y: 32 }
+          targets:
+            - expr: celery_workers_active
+              legendFormat: "活跃工作进程"
+
+      time:
+        from: now-1h
+        to: now
+      refresh: 30s
+
+  - dashboard:
+      id: null
+      uid: 1688sync-logs
+      title: "1688sync 日志监控"
+      tags: ["1688sync", "logs"]
+      timezone: browser
+      panels:
+        - title: "错误日志"
+          type: logs
+          gridPos: { h: 16, w: 24, x: 0, y: 0 }
+          targets:
+            - expr: '{app="1688sync", level="error"}'
+              legendFormat: ""
+        - title: "应用日志"
+          type: logs
+          gridPos: { h: 16, w: 24, x: 0, y: 16 }
+          targets:
+            - expr: '{app="1688sync"}'
+              legendFormat: ""
+
+      time:
+        from: now-1h
+        to: now
+      refresh: 30s
+
+  - dashboard:
+      id: null
+      uid: 1688sync-performance
+      title: "1688sync 性能分析"
+      tags: ["1688sync", "performance"]
+      timezone: browser
+      panels:
+        - title: "API响应时间分布"
+          type: heatmap
+          gridPos: { h: 8, w: 12, x: 0, y: 0 }
+          targets:
+            - expr: rate(http_request_duration_seconds_bucket[5m])
+              legendFormat: "{{ le }}"
+        - title: "错误率趋势"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 12, y: 0 }
+          targets:
+            - expr: rate(http_requests_total{status=~"4.."}[5m]) / rate(http_requests_total[5m])
+              legendFormat: "4xx错误率"
+            - expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m])
+              legendFormat: "5xx错误率"
+
+        - title: "数据库查询性能"
+          type: graph
+          gridPos: { h: 8, w: 12, x: 0, y: 8 }
+          targets:
+            - expr: mysql_global_status_queries
+              legendFormat: "查询数"
+            - expr: mysql_global_status_questions
+              legendFormat: "问题数"
+        - title: "缓存命中率"
+          type: stat
+          gridPos: { h: 8, w: 12, x: 12, y: 8 }
+          targets:
+            - expr: redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total)
+              legendFormat: "命中率"
+
+      time:
+        from: now-1h
+        to: now
+      refresh: 30s

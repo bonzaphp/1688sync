@@ -1,7 +1,7 @@
 """
 商品图片数据模型
 """
-from sqlalchemy import BigInteger, Column, Index, String
+from sqlalchemy import BigInteger, Column, ForeignKey, Index, String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship
 
@@ -136,7 +136,7 @@ class ProductImage(Base):
     )
 
     # 扩展属性
-    metadata = Column(
+    image_metadata = Column(
         JSON,
         nullable=True,
         comment="图片元数据: {exif, color_profile, ...}"
@@ -221,12 +221,12 @@ class ProductImage(Base):
 
     def add_metadata(self, key: str, value):
         """添加元数据"""
-        if self.metadata is None:
-            self.metadata = {}
-        self.metadata[key] = value
+        if self.image_metadata is None:
+            self.image_metadata = {}
+        self.image_metadata[key] = value
 
     def get_metadata(self, key: str, default=None):
         """获取元数据"""
-        if self.metadata is None:
+        if self.image_metadata is None:
             return default
-        return self.metadata.get(key, default)
+        return self.image_metadata.get(key, default)

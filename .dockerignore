@@ -1,0 +1,104 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# 虚拟环境
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 项目特定
+data/
+logs/
+backups/
+checkpoints/
+images/
+*.pid
+*.sock
+
+# 配置文件（敏感信息）
+.env
+.env.local
+.env.*.local
+config/local/
+config/secrets/
+
+# 测试
+tests/
+test_*.py
+*_test.py
+
+# 文档
+docs/
+*.md
+!README.md
+
+# 临时文件
+tmp/
+temp/
+*.tmp
+*.temp
+
+# 构建产物
+build/
+dist/
+*.egg-info/
+
+# Claude相关
+.claude/
+
+# 监控数据
+monitoring_data/
+*.csv
+*.json.bak
+
+# SSL证书
+ssl/
+*.pem
+*.key
+*.crt
+
+# 数据库文件
+*.db
+*.sqlite
+*.sqlite3

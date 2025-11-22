@@ -1,0 +1,199 @@
+version: '3.8'
+
+services:
+  # 主应用服务 - 生产配置
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: 1688sync-app-prod
+    restart: always
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/1688sync
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DEBUG=false
+      - LOG_LEVEL=WARNING
+      - SENTRY_DSN=${SENTRY_DSN}
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+      - app_checkpoints:/app/checkpoints
+      - app_backups:/app/backups
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - 1688sync-network
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Celery Worker - 生产配置
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    restart: always
+    command: python -m celery -A src.task_queue.celery_app worker --loglevel=warning --concurrency=8 --max-tasks-per-child=100
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/1688sync
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - DEBUG=false
+      - LOG_LEVEL=WARNING
+      - SENTRY_DSN=${SENTRY_DSN}
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+      - app_checkpoints:/app/checkpoints
+    depends_on:
+      - mysql
+      - redis
+      - app
+    networks:
+      - 1688sync-network
+    deploy:
+      replicas: 3
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+
+  # MySQL - 生产配置
+  mysql:
+    image: mysql:8.0
+    container_name: 1688sync-mysql-prod
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=1688sync
+      - MYSQL_CHARACTER_SET_SERVER=utf8mb4
+      - MYSQL_COLLATION_SERVER=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+      - mysql_backup:/backup
+      - ./config/mysql/my.cnf.prod:/etc/mysql/conf.d/my.cnf
+    networks:
+      - 1688sync-network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Redis - 生产配置
+  redis:
+    image: redis:7-alpine
+    container_name: 1688sync-redis-prod
+    restart: always
+    volumes:
+      - redis_data_prod:/data
+      - ./config/redis/redis.conf.prod:/etc/redis/redis.conf
+    command: redis-server /etc/redis/redis.conf --maxmemory 2gb --maxmemory-policy allkeys-lru
+    networks:
+      - 1688sync-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # 监控服务 - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: 1688sync-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - 1688sync-network
+
+  # 监控服务 - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: 1688sync-grafana
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - 1688sync-network
+
+volumes:
+  mysql_data_prod:
+    driver: local
+  redis_data_prod:
+    driver: local
+  app_data:
+    driver: local
+  app_logs:
+    driver: local
+  app_checkpoints:
+    driver: local
+  app_backups:
+    driver: local
+  mysql_backup:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  1688sync-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
