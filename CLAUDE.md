@@ -113,6 +113,74 @@ CURRENT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 ❌ {What failed}: {Exact solution}
 ```
 
+### Agent Coordination (`.claude/rules/agent-coordination.md`)
+
+**Multi-agent collaboration rules:**
+- **File-level parallelism**: Agents work on different files to avoid conflicts
+- **Explicit coordination**: Coordinate when same file needed
+- **Atomic commits**: Make commits focused and atomic
+- **Human resolution**: Conflicts resolved by humans, not agents
+
+**Work stream assignment:**
+```yaml
+Stream A: Database Layer
+  Files: src/db/*, migrations/*
+  Agent: backend-specialist
+
+Stream B: API Layer
+  Files: src/api/*
+  Agent: api-specialist
+```
+
+**Best practices:**
+- Commit early and often
+- Stay in assigned file patterns
+- Update progress files regularly
+- Pull frequently to stay synchronized
+- Never use `--force` flags
+
+### File Operations Standards
+
+**Read before write:**
+- Always use `Read` tool before `Edit` or `Write`
+- Preserve frontmatter when editing files
+- Use relative paths per path standards
+
+**File creation:**
+- Prefer editing existing files over creating new ones
+- Only create new files when absolutely necessary
+- Include proper frontmatter for metadata files
+
+### Git Operations Standards
+
+**Commit message format:**
+```bash
+git commit -m "Issue #{number}: {specific change} - {brief description}
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
+**Branch operations:**
+- Follow `.claude/rules/branch-operations.md`
+- Verify branch before operations
+- Use worktrees for epic isolation when needed
+
+### Error Handling Standards
+
+**Clear error messages:**
+```
+❌ {Component} {operation} failed: {exact solution}
+
+Example: "❌ Epic not found: Run /pm:prd-parse feature-name"
+```
+
+**Validation approach:**
+- Check only critical prerequisites
+- Trust the system for common operations
+- Provide exact fix instructions
+
 ## File Formats
 
 ### Frontmatter Standard
@@ -163,6 +231,13 @@ The system includes specialized agents:
 
 Use `/pm:epic-start <epic-name>` to launch parallel task execution.
 
+### Multi-Agent Coordination
+The system supports advanced multi-agent collaboration:
+- **Work stream assignment**: Each agent gets specific file patterns
+- **Conflict prevention**: File-level parallelism avoids conflicts
+- **Progress tracking**: Each stream maintains progress files
+- **Human oversight**: Conflicts require human resolution
+
 ### Path Tools (`.claude/scripts/path-tools-README.md`)
 Built-in utilities for:
 - Path normalization (absolute → relative)
@@ -190,6 +265,13 @@ Built-in utilities for:
 2. Check for conflicts and resolve explicitly
 3. Update `last_sync` timestamp after successful sync
 
+### For Multi-Agent Work
+1. Follow work stream assignments from analysis files
+2. Update progress files in `.claude/epics/{name}/updates/`
+3. Commit frequently with clear, focused messages
+4. Pull regularly to stay synchronized with other agents
+5. Report conflicts immediately for human resolution
+
 ## Validation & Health Checks
 
 Run `/pm:validate` to check:
@@ -200,6 +282,19 @@ Run `/pm:validate` to check:
 
 This should be run before major operations to catch issues early.
 
+## Epic Execution Patterns
+
+### Standard Epic Lifecycle
+1. **PRD Creation** → **Epic Parsing** → **Task Decomposition**
+2. **GitHub Sync** → **Epic Start** → **Parallel Agent Execution**
+3. **Progress Monitoring** → **Integration Testing** → **Epic Completion**
+
+### Multi-Agent Best Practices
+- **Atomic commits**: Each commit has single purpose
+- **Progress transparency**: Regular status updates
+- **Conflict avoidance**: Stay in assigned file patterns
+- **Quality focus**: Don't rush, ensure code quality
+
 ## Tips
 
 - Start with `/pm:help` for command reference
@@ -207,6 +302,8 @@ This should be run before major operations to catch issues early.
 - Run `/pm:status` for quick project overview
 - Check `.claude/rules/` directory for specific operational guidance
 - The system is designed to be simple - trust the workflows and follow the rules
+- For complex tasks, break them into smaller, focused commits
+- Use worktrees for isolated epic development when needed
 
 ## Integration Notes
 
@@ -217,3 +314,27 @@ This system integrates with:
 - **File System** - For local data persistence
 
 All synchronization happens through the gh CLI, ensuring GitHub is always the single source of truth for project state.
+
+## Troubleshooting Common Issues
+
+### Git Conflicts
+- Stop work immediately when conflicts detected
+- Report exact files and error messages
+- Wait for human resolution
+- Never attempt automatic merge resolution
+
+### GitHub API Issues
+- Check `gh auth status` first
+- Verify repository permissions
+- Use clear error messages with exact solutions
+
+### Path Issues
+- Always use relative paths
+- Never include absolute paths in commits or issues
+- Follow path-standards.md for consistency
+
+### Multi-Agent Coordination
+- Check work stream assignments before starting
+- Update progress files regularly
+- Pull frequently to stay synchronized
+- Report blocking issues immediately
