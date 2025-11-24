@@ -44,15 +44,40 @@ python init_db.py
 ```
 
 ### 4. 启动服务
-```bash
-# 方式一：使用CLI爬虫
-python cli.py crawl products --max-products 10
 
-# 方式二：启动Web API
+#### 方式一：基础功能演示
+```bash
+# 运行简单演示（无需Redis）
+python simple_demo.py
+
+# 查看爬虫使用说明
+python demo_crawl.py --help
+```
+
+#### 方式二：完整爬虫功能（需要Redis）
+```bash
+# 启动Redis服务
+docker run -d -p 6379:6379 redis:alpine
+
+# 启动Celery Worker（新开终端）
+python scripts/queue/start_worker.py
+
+# 运行爬虫任务
+python cli.py crawl products 123 --max-products 10
+
+# 查看队列状态
+python cli.py queue status
+```
+
+#### 方式三：Web API服务
+```bash
+# 启动API服务
 python run_api.py
 # 访问: http://localhost:8000/docs
+```
 
-# 方式三：启动Web界面
+#### 方式四：Web管理界面
+```bash
 cd web-dashboard && npm install && npm start
 # 访问: http://localhost:3000
 ```
