@@ -33,8 +33,15 @@ cp .env.example .env
 
 ### 3. 初始化项目
 ```bash
-# 一键初始化（创建数据库、数据目录等）
-python cli.py init
+# 创建数据目录
+mkdir -p data logs images
+
+# 初始化数据库（Python）
+python -c "
+from src.database.connection import create_tables
+create_tables()
+print('数据库初始化完成！')
+"
 ```
 
 ### 4. 启动服务
@@ -213,11 +220,15 @@ docker run -d -p 6379:6379 redis:alpine
 
 ### 重置系统
 ```bash
-# 完全重置（会删除所有数据）
-python cli.py reset
+# 删除数据库文件
+rm -f data/1688sync.db
 
-# 重新初始化
-python cli.py init
+# 重新初始化数据库
+python -c "
+from src.database.connection import create_tables
+create_tables()
+print('数据库重新初始化完成！')
+"
 ```
 
 ---
