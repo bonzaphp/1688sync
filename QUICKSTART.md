@@ -36,10 +36,13 @@ cp .env.example .env
 # 创建数据目录
 mkdir -p data logs images
 
+# 安装SQLite依赖（如果需要）
+pip install "aiosqlite>=0.19.0"
+
 # 初始化数据库（Python）
 python -c "
-from src.database.connection import create_tables
-create_tables()
+from src.database.connection import create_tables_sync
+create_tables_sync()
 print('数据库初始化完成！')
 "
 ```
@@ -225,8 +228,8 @@ rm -f data/1688sync.db
 
 # 重新初始化数据库
 python -c "
-from src.database.connection import create_tables
-create_tables()
+from src.database.connection import create_tables_sync
+create_tables_sync()
 print('数据库重新初始化完成！')
 "
 ```
