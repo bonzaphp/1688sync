@@ -15,10 +15,10 @@ from click import echo, style, secho
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from src.queue.manager import QueueManager
-from src.queue.tasks.data_sync import SyncProductsTask, SyncSuppliersTask, ValidateDataTask, CleanupDuplicatesTask
-from src.queue.tasks.crawler import FetchProductsTask, FetchProductDetailsTask, FetchSuppliersTask, SyncCategoryTask
-from src.queue.tasks.base import TaskResult
+from src.task_queue.manager import QueueManager
+from src.task_queue.tasks.data_sync import SyncProductsTask, SyncSuppliersTask, ValidateDataTask, CleanupDuplicatesTask
+from src.task_queue.tasks.crawler import FetchProductsTask, FetchProductDetailsTask, FetchSuppliersTask, SyncCategoryTask
+from src.task_queue.tasks.base import TaskResult
 from config.settings import get_settings
 
 # 配置日志

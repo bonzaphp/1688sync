@@ -5,6 +5,7 @@ import os
 from typing import Optional
 from pydantic import Field
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 
 
 class DatabaseSettings(BaseSettings):
@@ -56,9 +57,11 @@ class DatabaseSettings(BaseSettings):
             f"{self.host}:{self.port}/{self.database}"
         )
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"  # 忽略额外的环境变量
+    )
 
 
 # 全局配置实例
