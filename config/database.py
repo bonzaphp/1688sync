@@ -12,6 +12,7 @@ class DatabaseSettings(BaseSettings):
     """数据库配置类"""
 
     # 数据库连接配置
+    database_url: Optional[str] = Field(default=None, env="DATABASE_URL")
     host: str = Field(default="localhost", env="DB_HOST")
     port: int = Field(default=5432, env="DB_PORT")
     database: str = Field(default="1688sync", env="DB_NAME")
@@ -38,6 +39,11 @@ class DatabaseSettings(BaseSettings):
     @property
     def database_url(self) -> str:
         """生成数据库连接URL"""
+        # 如果已经设置了DATABASE_URL，直接使用
+        if self.database_url:
+            return self.database_url
+
+        # 根据配置生成PostgreSQL URL
         if self.ssl_mode:
             return (
                 f"postgresql+asyncpg://{self.username}:{self.password}@"
@@ -52,6 +58,15 @@ class DatabaseSettings(BaseSettings):
     @property
     def sync_database_url(self) -> str:
         """生成同步数据库连接URL（用于Alembic迁移）"""
+        # 如果已经设置了DATABASE_URL，转换为同步版本
+        if self.database_url:
+            if "sqlite" in self.database_url:
+                return self.database_url.replace("sqlite+aiosqlite:", "sqlite:")
+            elif "postgresql+asyncpg" in self.database_url:
+                return self.database_url.replace("postgresql+asyncpg:", "postgresql+psycopg2:")
+            return self.database_url
+
+        # 默认PostgreSQL同步URL
         return (
             f"postgresql+psycopg2://{self.username}:{self.password}@"
             f"{self.host}:{self.port}/{self.database}"

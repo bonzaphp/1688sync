@@ -45,30 +45,44 @@ class DatabaseManager:
             return
 
         try:
-            # 创建数据库引擎
-            self._engine = create_async_engine(
-                db_settings.database_url,
-                # 连接池配置
-                poolclass=NullPool if test_mode else QueuePool,
-                pool_size=db_settings.pool_size,
-                max_overflow=db_settings.max_overflow,
-                pool_timeout=db_settings.pool_timeout,
-                pool_recycle=db_settings.pool_recycle,
-                pool_pre_ping=db_settings.pool_pre_ping,
-                # 连接选项
-                echo=db_settings.echo,
-                echo_pool=db_settings.echo_pool,
-                future=db_settings.future,
-                # 连接参数
-                connect_args={
-                    "command_timeout": 60,
-                    "timeout": 60,
-                    "server_settings": {
-                        "application_name": "1688sync",
-                        "jit": "off",  # 关闭JIT提升简单查询性能
+            # 根据数据库类型设置不同的连接参数
+            if "sqlite" in db_settings.database_url:
+                # SQLite配置
+                engine_kwargs = {
+                    "echo": db_settings.echo,
+                    "future": db_settings.future,
+                    "connect_args": {
+                        "check_same_thread": False,
+                        "timeout": 60
                     }
                 }
-            )
+            else:
+                # PostgreSQL配置
+                engine_kwargs = {
+                    # 连接池配置
+                    "poolclass": NullPool if test_mode else QueuePool,
+                    "pool_size": db_settings.pool_size,
+                    "max_overflow": db_settings.max_overflow,
+                    "pool_timeout": db_settings.pool_timeout,
+                    "pool_recycle": db_settings.pool_recycle,
+                    "pool_pre_ping": db_settings.pool_pre_ping,
+                    # 连接选项
+                    "echo": db_settings.echo,
+                    "echo_pool": db_settings.echo_pool,
+                    "future": db_settings.future,
+                    # 连接参数
+                    "connect_args": {
+                        "command_timeout": 60,
+                        "timeout": 60,
+                        "server_settings": {
+                            "application_name": "1688sync",
+                            "jit": "off",  # 关闭JIT提升简单查询性能
+                        }
+                    }
+                }
+
+            # 创建数据库引擎
+            self._engine = create_async_engine(db_settings.database_url, **engine_kwargs)
 
             # 创建会话工厂
             self._session_factory = async_sessionmaker(
@@ -120,7 +134,7 @@ class DatabaseManager:
         try:
             async with self._engine.begin() as conn:
                 result = await conn.execute(text("SELECT 1"))
-                await result.fetchone()
+                result.fetchone()  # 移除await，因为fetchone()返回Row对象
             logger.info("数据库连接测试成功")
         except Exception as e:
             logger.error(f"数据库连接测试失败: {e}")
@@ -232,3 +246,42 @@ async def init_database(test_mode: bool = False):
 async def close_database():
     """关闭数据库连接的便捷函数"""
     await db_manager.close()
+
+
+async def create_tables():
+    """创建数据库表的便捷函数"""
+    try:
+        # 首先初始化数据库连接
+        await init_database()
+
+        # 导入所有模型以确保它们被注册
+        from ..models import product, supplier, image, sync_record
+
+        # 创建所有表
+        async with db_manager.engine.begin() as conn:
+            # 导入Base并创建所有表
+            from ..models.base import Base
+            await conn.run_sync(Base.metadata.create_all)
+
+        print("数据库表创建成功！")
+
+    except Exception as e:
+        print(f"创建数据库表失败: {e}")
+        raise
+
+
+def create_tables_sync():
+    """创建数据库表的同步版本（用于CLI等同步环境）"""
+    import asyncio
+
+    # 检查是否已有事件循环
+    try:
+        loop = asyncio.get_running_loop()
+        # 如果已有运行中的循环，创建任务
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, create_tables())
+            return future.result()
+    except RuntimeError:
+        # 没有运行中的循环，直接运行
+        return asyncio.run(create_tables())
